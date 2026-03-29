@@ -7,3 +7,9 @@ gitignore
 
 runs/
 *.pt
+
+create_project.sh
+create_project1.sh
+dataset_tree.txt
+msd_tree.txt
+tree.txt
