@@ -1,0 +1,9 @@
+gitignore
+# 忽略论文碎片文件夹
+/论文碎片/
+
+# 忽略 dataset 文件夹
+/dataset/
+
+runs/
+*.pt
