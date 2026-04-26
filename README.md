@@ -11,4 +11,3 @@
 ## 快速开始
 1. 准备数据：`python scripts/convert_dataset.py`
 2. 训练基线：`python scripts/train.py --data config/msd.yaml --model yolov8s.pt`
-3. 启动系统：`python system/main_window.py`
