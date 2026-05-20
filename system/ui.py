@@ -46,19 +46,31 @@ class DefectDetector(QThread):
             # 进行检测
             results = self.model(img)
             
-            # 处理结果
-            annotated_img = results[0].plot()
-            
-            # 提取检测信息
+            # 提取检测信息，并过滤低置信度结果
             detections = results[0].boxes
-            defect_info = f"检测到 {len(detections)} 个缺陷:\n"
-            for i, box in enumerate(detections):
+            filtered_boxes = [box for box in detections if box.conf.item() > 0.5]
+            defect_info = f"检测到 {len(filtered_boxes)} 个缺陷:\n"
+            annotated_img = img.copy()
+
+            for i, box in enumerate(filtered_boxes):
                 cls = int(box.cls.item())
                 conf = box.conf.item()
                 english_name = self.model.names[cls]
                 class_name = self.names_map.get(english_name, english_name)
                 defect_info += f"{i+1}. {class_name} (置信度: {conf:.2f})\n"
-            
+
+                # 绘制过滤后的检测框，文本使用英文名以避免 OpenCV 中文乱码
+                xyxy = box.xyxy[0].tolist()
+                x1, y1, x2, y2 = map(int, xyxy)
+                cv2.rectangle(annotated_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                label = f"{english_name} {conf:.2f}"
+                t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
+                cv2.rectangle(annotated_img, (x1, y1 - t_size[1] - 8), (x1 + t_size[0] + 8, y1), (0, 255, 0), -1)
+                cv2.putText(annotated_img, label, (x1 + 4, y1 - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
+
+            if len(filtered_boxes) == 0:
+                defect_info = "未检测到置信度大于0.50的缺陷"
+
             self.detection_done.emit(annotated_img, defect_info)
         except Exception as e:
             self.detection_done.emit(None, f"检测失败: {str(e)}")
@@ -102,7 +114,7 @@ class Ui_MainWindow(object):
         self.defect_browser.setGeometry(QtCore.QRect(820, 188, 400, 501))
         self.defect_browser.setStyleSheet("font-size: 18px; font-weight: bold; color: #FF0000; background-color: #FFFFFF; border: 2px solid #000000;")
         self.defect_browser.setObjectName("defect_browser")
-        self.defect_browser.setPlainText("缺陷检测结果将显示在这里")
+        self.defect_browser.setPlainText("缺陷检测结果")
 
         # 结果显示区
         self.textBrowser = QtWidgets.QTextBrowser(self.centralwidget)
@@ -165,7 +177,7 @@ class Ui_MainWindow(object):
     def load_model(self):
         try:
             # 使用训练好的模型
-            model_path = "runs/train/ssgd_ca/weights/best.pt"
+            model_path = "runs/train/ssgd_baseline_hyper/weights/best.pt"
             self.model = YOLO(model_path)
             self.printf("模型加载成功")
         except Exception as e:

@@ -1,0 +1,15 @@
+超参数版本:
+# 基线300轮
+yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=yolov8s.pt epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 momentum=0.937 weight_decay=0.0005 warmup_epochs=3 iou=0.45 patience=50 project=~/毕业设计/runs/train  name=ssgd_baseline_hyper
+
+# CA 300轮
+yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=models/yolov8s_ca.yaml epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.005 momentum=0.937 weight_decay=0.0005 warmup_epochs=5 iou=0.45 patience=50 project=runs/train name=ssgd_ca_300e
+
+参数	取值	说明
+optimizer	SGD	参照文献使用随机梯度下降，通常比AdamW更适合较长训练轮数
+lr0	0.01	初始学习率，SGD推荐值
+momentum	0.937	YOLOv8默认动量
+weight_decay	0.0005	权重衰减，防止过拟合
+warmup_epochs	3	预热轮数，初期稳定训练
+iou	0.45	与文献保持一致，用于NMS和正负样本分配
+patience	50	验证集mAP连续50轮不提升则早停，比默认更宽松
