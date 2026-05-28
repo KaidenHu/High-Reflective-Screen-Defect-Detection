@@ -2,6 +2,7 @@
 #This is UI of the mobile screen defect detection system.
 import os
 import sys
+import yaml
 from pathlib import Path
 
 # Ensure Qt plugins are loaded from the current conda environment's PyQt5 installation.
@@ -34,7 +35,7 @@ class DefectDetector(QThread):
         self.image_path = image_path
         self.model = model
         self.names_map = names_map
-    
+
     def run(self):
         try:
             # 加载图像
@@ -48,28 +49,30 @@ class DefectDetector(QThread):
             
             # 提取检测信息，并过滤低置信度结果
             detections = results[0].boxes
-            filtered_boxes = [box for box in detections if box.conf.item() > 0.30]  # 过滤掉置信度小于0.30的检测结果
+            filtered_boxes = [box for box in detections if box.conf.item() > 0.20]  # 过滤掉置信度小于0.30的检测结果
             defect_info = f"检测到 {len(filtered_boxes)} 个缺陷:\n"
             annotated_img = img.copy()
 
             for i, box in enumerate(filtered_boxes):
                 cls = int(box.cls.item())
                 conf = box.conf.item()
-                english_name = self.model.names[cls]
-                class_name = self.names_map.get(english_name, english_name)
+                #english_name = self.model.names[cls]
+                #class_name = self.names_map.get(english_name, english_name)
+                class_name = self.names_map[cls]
                 defect_info += f"{i+1}. {class_name} (置信度: {conf:.2f})\n"
 
                 # 绘制过滤后的检测框，文本使用英文名以避免 OpenCV 中文乱码
                 xyxy = box.xyxy[0].tolist()
                 x1, y1, x2, y2 = map(int, xyxy)
                 cv2.rectangle(annotated_img, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                label = f"{english_name} {conf:.2f}"
+                #label = f"{english_name} {conf:.2f}"
+                label = f"{class_name} {conf:.2f}"
                 t_size = cv2.getTextSize(label, cv2.FONT_HERSHEY_SIMPLEX, 0.6, 2)[0]
                 cv2.rectangle(annotated_img, (x1, y1 - t_size[1] - 8), (x1 + t_size[0] + 8, y1), (0, 255, 0), -1)
                 cv2.putText(annotated_img, label, (x1 + 4, y1 - 4), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 0, 0), 2)
 
             if len(filtered_boxes) == 0:
-                defect_info = "未检测到置信度大于0.50的缺陷"
+                defect_info = "未检测到明显缺陷"
 
             self.detection_done.emit(annotated_img, defect_info)
         except Exception as e:
@@ -154,15 +157,17 @@ class Ui_MainWindow(object):
         self.model = None
         self.current_image_path = None
         # 中文类别映射
-        self.class_names_map = {
-            'crack': '裂纹',
-            'spot': '斑点',
-            'broken': '破损',
-            'scratch': '划痕',
-            'light-leakage': '漏光',
-            'broken-membrane': '破膜',
-            'blot': '污渍'
-        }
+        # self.class_names_map = {
+        #     'crack': '碎裂',
+        #     'spot': '斑点',
+        #     'broken': '破碎',
+        #     'scratch': '划痕',
+        #     'light-leakage': '漏光',
+        #     'broken-membrane': '破膜',
+        #     'blot': '污渍',
+        #     'blot': '污渍'
+        # }
+        self.load_class_names()
         self.load_model()
 
     def retranslateUi(self, MainWindow):
@@ -174,11 +179,20 @@ class Ui_MainWindow(object):
         self.detect_button.setText(_translate("MainWindow", "开始检测"))
         self.exit_button.setText(_translate("MainWindow", "退出系统"))
 
+    def load_class_names(self):
+        yaml_path = "dataset/SSGD_mix_yolo/data.yaml"
+        #yaml_path = "dataset/MSD_yolo/data.yaml"
+        with open(yaml_path, 'r', encoding='utf-8') as f:
+            data = yaml.safe_load(f)
+        
+        self.class_names = data['names']
+
     def load_model(self):
         try:
             # 使用训练好的模型
-            model_path = "runs/train/论文用了的/ssgd_yolo11s/weights/best.pt"
-            #model_path = "runs/train/论文用了的/ghostca_eiou/weights/best.pt"
+            #model_path = "runs/train/ghostcaeiou_msd/weights/best.pt"
+            #model_path = "runs/train/ssgd_yolo11s/weights/best.pt"
+            model_path = "runs/train/ghostca_eiou/weights/best.pt"
             self.model = YOLO(model_path)
             self.printf("模型加载成功")
         except Exception as e:
@@ -188,7 +202,7 @@ class Ui_MainWindow(object):
         fname, _ = QFileDialog.getOpenFileName(None, "选择图像", "", "Image Files (*.png *.jpg *.jpeg *.bmp)")
         if fname:
             self.current_image_path = fname
-            self.printf(f"已选择图像: {fname}")
+            #self.printf(f"已选择图像: {fname}")
             # 显示原始图像
             img = cv2.imread(fname)
             if img is not None:
@@ -196,14 +210,14 @@ class Ui_MainWindow(object):
 
     def start_detection(self):
         if self.model is None:
-            self.printf("模型未加载")
+            #self.printf("模型未加载")
             return
         if self.current_image_path is None:
-            self.printf("请先选择图像")
+            #self.printf("请先选择图像")
             return
         
-        self.printf("开始检测...")
-        self.detector_thread = DefectDetector(self.current_image_path, self.model, self.class_names_map)
+        #self.printf("开始检测...")
+        self.detector_thread = DefectDetector(self.current_image_path, self.model, self.class_names)
         self.detector_thread.detection_done.connect(self.on_detection_done)
         self.detector_thread.start()
 
@@ -211,7 +225,7 @@ class Ui_MainWindow(object):
         if annotated_img is not None:
             self.show_image(annotated_img)
         self.defect_browser.setPlainText(info)
-        self.printf("检测完成，结果已显示在缺陷区域。")
+        #self.printf("检测完成，结果已显示在缺陷区域。")
 
     def show_image(self, img):
         img2 = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
