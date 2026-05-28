@@ -9,7 +9,8 @@ echo "============================================"
 echo "Starting training: YOLOv8s Baseline"
 date
 echo "============================================"
-yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=yolov8s.pt epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 project=runs/train name=ssgd_baseline_300e
+#yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=yolov8s.pt epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 project=runs/train name=ssgd_baseline_300e
+yolo detect train data=dataset/SSGD_mix_yolo/data.yaml model=models/yolov8s.pt epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 momentum=0.937 weight_decay=0.0005 warmup_epochs=3 cos_lr=True patience=100 project=~/毕业设计/runs/train name=baseline_300e
 # 检查上一条命令是否执行成功，如果失败则退出脚本，避免浪费资源继续训练
 if [ $? -ne 0 ]; then
     echo "YOLOv8s Baseline training failed! Exiting."
@@ -21,7 +22,7 @@ echo "============================================"
 echo "Starting training: YOLOv8s + GhostNet"
 date
 echo "============================================"
-yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=models/yolov8_ghost.yaml epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 project=runs/train name=ssgd_baseline_hyper_ghost
+yolo detect train data=dataset/SSGD_mix_yolo/data.yaml model=models/yolov8_ghostv2.yaml epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 momentum=0.937 weight_decay=0.0005 warmup_epochs=3 cos_lr=True patience=100 project=~/毕业设计/runs/train name=ghostnetv2
 
 if [ $? -ne 0 ]; then
     echo "YOLOv8s_GhostNet training failed! Exiting."
@@ -33,7 +34,7 @@ echo "============================================"
 echo "Starting training: YOLOv8s + GhostNet + CA"
 date
 echo "============================================"
-yolo detect train data=dataset/SSGD_lb101_yolo/data.yaml model=models/yolov8_ghost_ca.yaml epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 project=runs/train name=ssgd_baseline_hyper_ghost_ca
+yolo detect train data=dataset/SSGD_mix_yolo/data.yaml model=models/yolov8_ghost_ca_v2.yaml epochs=300 imgsz=640 batch=16 optimizer=SGD lr0=0.01 momentum=0.937 weight_decay=0.0005 warmup_epochs=3 cos_lr=True patience=100 project=~/毕业设计/runs/train name=ghostcav2
 
 if [ $? -ne 0 ]; then
     echo "YOLOv8s_GhostNet+CA training failed! Exiting."

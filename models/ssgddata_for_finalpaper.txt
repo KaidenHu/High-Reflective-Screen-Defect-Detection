@@ -1,0 +1,58 @@
+baseline:
+Ultralytics 8.4.31 🚀 Python-3.9.25 torch-2.8.0+cu128 CUDA:0 (NVIDIA GeForce RTX 3060 Laptop GPU, 5804MiB)
+Model summary (fused): 73 layers, 11,128,293 parameters, 0 gradients, 28.5 GFLOPs
+val: Fast image access ✅ (ping: 0.0±0.0 ms, read: 6637.4±731.8 MB/s, size: 406.5 KB)
+val: Scanning /home/kaiden/毕业设计/dataset/SSGD_mix_yolo/labels/val.cache... 338 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 338/338 83.4Mit/s 0.0s
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 22/22 7.4it/s 3.0s
+                   all        338        760      0.522      0.446      0.425      0.198
+                 crack         76        200      0.398      0.495      0.381      0.158
+                  spot         89        175      0.489      0.571      0.536        0.3
+                broken        105        163      0.607      0.738      0.688      0.337
+               scratch         85        148      0.464      0.628      0.502      0.143
+         light-leakage         50         54      0.699      0.515      0.606      0.322
+       broken-membrane          3         10          1      0.176      0.226      0.106
+                  blot          5         10          0          0       0.04     0.0223
+Speed: 0.7ms preprocess, 5.0ms inference, 0.0ms loss, 1.2ms postprocess per image
+Results saved to /home/kaiden/毕业设计/runs/val/baselinev8_msd_valssgd
+
+YOLOv8_ghostv2 summary (fused): 80 layers, 9,993,061 parameters, 0 gradients, 26.2 GFLOPs
+                   all        338        760      0.474      0.379      0.376      0.166
+                 crack         76        200      0.393      0.465      0.326       0.12
+                  spot         89        175      0.576      0.622      0.576      0.279
+                broken        105        163      0.624      0.519      0.595       0.25
+               scratch         85        148      0.523      0.481      0.489       0.15
+         light-leakage         50         54      0.673      0.463      0.523      0.282
+       broken-membrane          3         10       0.53        0.1       0.11     0.0729
+                  blot          5         10          0          0    0.00997    0.00464
+Speed: 0.7ms preprocess, 5.5ms inference, 0.0ms loss, 0.8ms postprocess per image
+Results saved to /home/kaiden/毕业设计/runs/val/ghostnetv8ssgd_valssgd
+
+YOLOv8_ghost_ca_v2 summary (fused): 85 layers, 11,129,877 parameters, 0 gradients, 28.0 GFLOPs
+val: Fast image access ✅ (ping: 0.0±0.0 ms, read: 5150.1±1322.7 MB/s, size: 355.7 KB)
+val: Scanning /home/kaiden/毕业设计/dataset/SSGD_mix_yolo/labels/val.cache... 338 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 338/338 83.4Mit/s 0.0s
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 22/22 7.0it/s 3.2s
+                   all        338        760      0.449      0.389       0.38      0.161
+                 crack         76        200      0.441       0.49      0.377      0.156
+                  spot         89        175      0.552        0.6      0.596       0.28
+                broken        105        163      0.541      0.521      0.501      0.211
+               scratch         85        148      0.559      0.514      0.538       0.16
+         light-leakage         50         54      0.483      0.397      0.464      0.227
+       broken-membrane          3         10      0.567        0.2      0.165     0.0816
+                  blot          5         10          0          0     0.0167    0.00707
+Speed: 0.8ms preprocess, 5.6ms inference, 0.0ms loss, 0.9ms postprocess per image
+Results saved to /home/kaiden/毕业设计/runs/val/gcfinal_valssgd
+
+YOLOv8_ghost_ca_v2_eiou summary (fused): 85 layers, 11,129,877 parameters, 0 gradients, 28.0 GFLOPs
+val: Fast image access ✅ (ping: 0.0±0.0 ms, read: 6690.6±1173.0 MB/s, size: 538.5 KB)
+val: Scanning /home/kaiden/毕业设计/dataset/SSGD_mix_yolo/labels/val.cache... 338 images, 0 backgrounds, 0 corrupt: 100% ━━━━━━━━━━━━ 338/338 74.6Mit/s 0.0s
+                 Class     Images  Instances      Box(P          R      mAP50  mAP50-95): 100% ━━━━━━━━━━━━ 22/22 7.0it/s 3.2s
+                   all        338        760      0.441      0.412      0.392      0.168
+                 crack         76        200       0.38       0.47      0.335      0.133
+                  spot         89        175      0.498       0.68      0.587      0.283
+                broken        105        163      0.581      0.571      0.557      0.253
+               scratch         85        148      0.515      0.588      0.553      0.165
+         light-leakage         50         54      0.575      0.476      0.607       0.27
+       broken-membrane          3         10       0.54        0.1     0.0997     0.0698
+                  blot          5         10          0          0    0.00778    0.00233
+Speed: 0.8ms preprocess, 5.7ms inference, 0.0ms loss, 0.8ms postprocess per image
+Results saved to /home/kaiden/毕业设计/runs/val/gceioufinal_valssgd
